@@ -26,3 +26,8 @@ def divide(a, b):
 def square(a):
     """Return the square of a."""
     return a * a
+
+
+def cube(a):
+    """Return the cube of a."""
+    return a * a * a
