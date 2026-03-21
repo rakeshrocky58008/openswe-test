@@ -1,24 +1,36 @@
 # openswe-test
 
-A simple Python project to provide and test openswe integration.
+A FastAPI project with a basic UI for testing the OpenSWE bot.
 
 ## Features
 
-- Basic arithmetic functions: add, subtract, multiply, divide
+- **Bot Chat UI** – send messages to the OpenSWE bot and view replies
+- **Calculator API** – basic arithmetic (add, subtract, multiply, divide) exposed as REST endpoints
+- **Interactive UI** served by FastAPI + Jinja2 at `http://localhost:8000`
 
-## Usage
+## Quick Start
 
-```python
-from calculator import add, subtract, multiply, divide
-
-result = add(2, 3)       # 5
-result = subtract(5, 3)  # 2
-result = multiply(3, 4)  # 12
-result = divide(10, 2)   # 5.0
+```bash
+pip install -r requirements.txt
+uvicorn main:app --reload
 ```
+
+Then open [http://localhost:8000](http://localhost:8000) in your browser.
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/` | Main UI |
+| GET | `/api/health` | Health check |
+| POST | `/api/bot/send` | Send a message to the bot |
+| POST | `/api/calculate` | Perform arithmetic |
+
+Interactive docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ## Running Tests
 
 ```bash
 pytest test_calculator.py
 ```
+

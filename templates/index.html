@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenSWE Bot Tester</title>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    /* ── Header ── */
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #6366f1, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    header p { color: #94a3b8; margin-top: 0.4rem; }
+
+    /* ── Card ── */
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 680px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,.4);
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    /* ── Bot chat ── */
+    #chat-log {
+      background: #0f172a;
+      border-radius: .6rem;
+      padding: 1rem;
+      height: 260px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: .6rem;
+    }
+    .msg {
+      max-width: 80%;
+      padding: .55rem .85rem;
+      border-radius: .75rem;
+      font-size: .9rem;
+      line-height: 1.4;
+      word-break: break-word;
+    }
+    .msg.user {
+      align-self: flex-end;
+      background: #6366f1;
+      color: #fff;
+      border-bottom-right-radius: .2rem;
+    }
+    .msg.bot {
+      align-self: flex-start;
+      background: #334155;
+      color: #e2e8f0;
+      border-bottom-left-radius: .2rem;
+    }
+    .msg.system {
+      align-self: center;
+      background: transparent;
+      color: #64748b;
+      font-style: italic;
+      font-size: .8rem;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: .5rem;
+    }
+    .chat-input-row input {
+      flex: 1;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: .5rem;
+      padding: .6rem .9rem;
+      color: #e2e8f0;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .chat-input-row input:focus { border-color: #6366f1; }
+
+    /* ── Calculator ── */
+    .calc-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+      margin-bottom: 1rem;
+    }
+    .calc-grid label { font-size: .8rem; color: #94a3b8; display: block; margin-bottom: .25rem; }
+    .calc-grid input, .calc-grid select {
+      width: 100%;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: .5rem;
+      padding: .55rem .8rem;
+      color: #e2e8f0;
+      font-size: .95rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .calc-grid input:focus, .calc-grid select:focus { border-color: #38bdf8; }
+    .calc-grid select option { background: #1e293b; }
+    #calc-result {
+      background: #0f172a;
+      border-radius: .5rem;
+      padding: .75rem 1rem;
+      font-size: 1.1rem;
+      color: #38bdf8;
+      min-height: 2.5rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    /* ── Buttons ── */
+    button {
+      background: linear-gradient(135deg, #6366f1, #38bdf8);
+      border: none;
+      border-radius: .5rem;
+      padding: .6rem 1.3rem;
+      color: #fff;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+    }
+    button:hover { opacity: .88; }
+    button:active { transform: scale(.97); }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* ── Footer ── */
+    footer { color: #475569; font-size: .8rem; text-align: center; margin-top: 1rem; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🤖 OpenSWE Bot Tester</h1>
+  <p>Interact with the OpenSWE bot and explore the API</p>
+</header>
+
+<!-- ── Bot Chat ── -->
+<div class="card">
+  <h2>💬 Bot Chat</h2>
+  <div id="chat-log">
+    <div class="msg system">Send a message to start testing the bot.</div>
+  </div>
+  <div class="chat-input-row">
+    <input id="bot-input" type="text" placeholder="Type a message…" autocomplete="off" />
+    <button id="bot-send-btn" onclick="sendBotMessage()">Send</button>
+  </div>
+</div>
+
+<!-- ── Calculator ── -->
+<div class="card">
+  <h2>🧮 Calculator API</h2>
+  <div class="calc-grid">
+    <div>
+      <label for="num-a">Number A</label>
+      <input id="num-a" type="number" value="10" step="any" />
+    </div>
+    <div>
+      <label for="num-b">Number B</label>
+      <input id="num-b" type="number" value="5" step="any" />
+    </div>
+    <div style="grid-column: span 2;">
+      <label for="operation">Operation</label>
+      <select id="operation">
+        <option value="add">Add (+)</option>
+        <option value="subtract">Subtract (−)</option>
+        <option value="multiply">Multiply (×)</option>
+        <option value="divide">Divide (÷)</option>
+      </select>
+    </div>
+  </div>
+  <div id="calc-result">—</div>
+  <button onclick="calculate()">Calculate</button>
+</div>
+
+<footer>OpenSWE Bot Tester · FastAPI + Jinja2</footer>
+
+<script>
+  /* ── Bot chat ── */
+  const chatLog = document.getElementById('chat-log');
+  const botInput = document.getElementById('bot-input');
+  const botSendBtn = document.getElementById('bot-send-btn');
+
+  function appendMsg(text, role) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + role;
+    div.textContent = text;
+    chatLog.appendChild(div);
+    chatLog.scrollTop = chatLog.scrollHeight;
+  }
+
+  async function sendBotMessage() {
+    const text = botInput.value.trim();
+    if (!text) return;
+    botInput.value = '';
+    botSendBtn.disabled = true;
+
+    appendMsg(text, 'user');
+
+    try {
+      const res = await fetch('/api/bot/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text }),
+      });
+      const data = await res.json();
+      appendMsg(data.reply, 'bot');
+    } catch (e) {
+      appendMsg('Error: ' + e.message, 'system');
+    } finally {
+      botSendBtn.disabled = false;
+      botInput.focus();
+    }
+  }
+
+  botInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') sendBotMessage();
+  });
+
+  /* ── Calculator ── */
+  async function calculate() {
+    const a = parseFloat(document.getElementById('num-a').value);
+    const b = parseFloat(document.getElementById('num-b').value);
+    const operation = document.getElementById('operation').value;
+    const resultEl = document.getElementById('calc-result');
+
+    if (isNaN(a) || isNaN(b)) {
+      resultEl.style.color = '#f87171';
+      resultEl.textContent = 'Please enter valid numbers.';
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ a, b, operation }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        resultEl.style.color = '#f87171';
+        resultEl.textContent = data.error;
+      } else {
+        resultEl.style.color = '#38bdf8';
+        resultEl.textContent = data.result;
+      }
+    } catch (e) {
+      resultEl.style.color = '#f87171';
+      resultEl.textContent = 'Error: ' + e.message;
+    }
+  }
+</script>
+</body>
+</html>
