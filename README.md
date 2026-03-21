@@ -5,7 +5,7 @@ A FastAPI project with a basic UI for testing the OpenSWE bot.
 ## Features
 
 - **Bot Chat UI** – send messages to the OpenSWE bot and view replies
-- **Calculator API** – basic arithmetic (add, subtract, multiply, divide) exposed as REST endpoints
+- **Calculator API** – basic arithmetic (add, subtract, multiply, divide) and power functions (square, cube) exposed as REST endpoints
 - **Interactive UI** served by FastAPI + Jinja2 at `http://localhost:8000`
 
 ## Quick Start

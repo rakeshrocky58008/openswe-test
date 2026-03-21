@@ -21,3 +21,13 @@ def divide(a, b):
     if b == 0:
         raise ValueError("Cannot divide by zero")
     return a / b
+
+
+def square(a):
+    """Return the square of a."""
+    return a * a
+
+
+def cube(a):
+    """Return the cube of a."""
+    return a * a * a
